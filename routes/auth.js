@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const authCtrl = require('../controllers/auth');
 
-router.get('/checkDB', authCtrl.checkDB)
 router.post('/signup', authCtrl.signup);
 router.post('/login', authCtrl.login);
 router.put('/forgot-password', authCtrl.forgotPassword)

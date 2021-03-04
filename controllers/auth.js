@@ -10,17 +10,7 @@ module.exports = {
   show,
   forgotPassword,
   updatePassword,
-  checkDB
 };
-
-function checkDB(req, res) {
-  db.query('SHOW DATABASES', (err, result) => {
-    if(err){
-      res.status(500).json(err)
-    }
-    res.json(result)
-  })
-}
 
 function createJWT(user) {
   return jwt.sign(

@@ -13,10 +13,12 @@ let connectionInfo = {
 const initialConnection = mysql.createConnection(connectionInfo)
 
 function createUserTable() {
-    db.query("CREATE TABLE users(id INT AUTO_INCREMENT NOT_NULL, name VARCHAR(45) NOT_NULL, email VARCHAR(320) NOT_NULL UNIQUE, password VARCHAR(200) NOT_NULL, resetLink VARCHAR(200) NOT_NULL DEFAULT '', PRIMARY KEY id);", () => {
-
+    db.query("CREATE TABLE users(id INT AUTO_INCREMENT, name VARCHAR(45), email VARCHAR(320) UNIQUE, password VARCHAR(200), resetLink VARCHAR(200) DEFAULT '', PRIMARY KEY (id));", (err, res) => {
+        if (err) throw err;
+        console.log('User table created.')
     })
 }
+
 
 initialConnection.query('SHOW DATABASES;', (err, databases) => {
     if(err) throw err;
@@ -24,13 +26,20 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
         connectionInfo.database = `${databaseName}`
         db = mysql.createConnection(connectionInfo)
         console.log(`MySQL connected to ${db.config.database} database.`)
+        db.query(`SELECT * FROM information_schema.tables WHERE table_schema = '${databaseName}' AND table_name = 'users';`, (err, res) => {
+            if(err) throw err;
+            if(!res.length) {
+                createUserTable()
+            }
+        })
     } else {
         initialConnection.query(`CREATE DATABASE ${databaseName};`, (err, res) => {
             if (err) throw err;
-            console.log(`${databaseName} database created`)
+            console.log(`${databaseName} database created.`)
             connectionInfo.database = `${databaseName}`
             db = mysql.createConnection(connectionInfo)
             console.log(`MySQL connected to ${db.config.database} database.`)
+            createUserTable()
         })
     }
 })
