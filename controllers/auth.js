@@ -1,7 +1,8 @@
-const User = require('../models/user');
+const db = require('../config/database')
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET;
 const nodemailer = require('nodemailer')
+let User
 
 module.exports = {
   signup,
@@ -9,7 +10,17 @@ module.exports = {
   show,
   forgotPassword,
   updatePassword,
+  checkDB
 };
+
+function checkDB(req, res) {
+  db.query('SHOW DATABASES', (err, result) => {
+    if(err){
+      res.status(500).json(err)
+    }
+    res.json(result)
+  })
+}
 
 function createJWT(user) {
   return jwt.sign(
@@ -21,13 +32,10 @@ function createJWT(user) {
 
 async function signup(req, res) {
   try {
-    const user = new User(req.body);
     try {
-      await user.save(function (err) {
-        if (err) {return res.status(500).json({err: 'Error: Database error'})}
-      });
-      const token = createJWT(user);
-      res.json({ token });
+      db.query('', (err, result) => {
+
+      })
     } catch (err) {
       res.status(400).json(err);
     }

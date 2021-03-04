@@ -74,7 +74,7 @@ let functions = {
   logout,
   login,
   forgotPassword,
-  resetPassword
+  resetPassword,
 };
 
 export default functions
