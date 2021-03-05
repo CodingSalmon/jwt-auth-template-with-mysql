@@ -1,7 +1,9 @@
-const db = require('../config/database')
+const db = require('../config/database');
 const jwt = require('jsonwebtoken');
-const SECRET = process.env.SECRET;
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+
+const SALT_ROUNDS = 6;
 let User
 
 module.exports = {
@@ -12,40 +14,50 @@ module.exports = {
   updatePassword,
 };
 
+function hashPassword(user, cb) {
+  bcrypt.hash(user.password, SALT_ROUNDS, function(err, hash) {
+    if (err) throw err;
+    user.password = hash;
+    cb(user)
+  });
+}
+
 function createJWT(user) {
   return jwt.sign(
     {user},
-    SECRET,
+    process.env.SECRET,
     {expiresIn: '24h'}
   );
 }
 
-async function signup(req, res) {
+function signup(req, res) {
   try {
-    try {
-      db.query('', (err, result) => {
-
+    hashPassword(req.body, (user) => {
+      db.query(`INSERT INTO users (name, email, password) VALUES ('${user.name}', '${user.email}', '${user.password}')`, (err, result) => {
+        if(err) res.status(500).json({err: 'Error: Database error'});
+        const token = createJWT(user)
+        res.json({token})
       })
-    } catch (err) {
-      res.status(400).json(err);
-    }
+    })
   } catch (err) {
-    console.log(err, '<-- error')
+    res.status(400).json(err);
   }
 }
 
 async function login(req, res) {
   try {
-    const user = await User.findOne({email: req.body.email});
-    if (!user) return res.status(401).json({err: 'Error: Bad credentials'});
-    user.comparePassword(req.body.password, (err, isMatch) => {
-      if (isMatch) {
-        const token = createJWT(user);
-        res.json({token});
-      } else {
-        return res.status(401).json({err: 'Error: Bad credentials'});
-      }
-    });
+    db.query(`SELECT * FROM users WHERE email = '${req.body.email}'`, (err, user) => {
+      if (err) return res.status(401).json({err: 'Error: Bad credentials'});
+      console.log(user)
+      bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
+        if (isMatch) {
+          const token = createJWT(user);
+          res.json({token});
+        } else {
+          return res.status(401).json({err: 'Error: Bad credentials'});
+        }
+      });
+    })
   } catch (err) {
     return res.status(401).json(err);
   }

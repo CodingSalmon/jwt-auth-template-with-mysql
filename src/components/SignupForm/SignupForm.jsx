@@ -19,7 +19,11 @@ const SignupForm = ({ history, handleSignupOrLogin, updateMessage }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            await userService.signup(signupInfo)
+            await userService.signup({
+                name: signupInfo.name,
+                email: signupInfo.email,
+                password: signupInfo.password,
+            })
             handleSignupOrLogin()
             history.push("/")
         } catch (err) {

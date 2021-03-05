@@ -13,6 +13,7 @@ function signup(user) {
   })
   .then(json => {
     if(json.token) return json;
+    console.log(json)
     throw new Error(`${json.err || json.message}`)
   })
   .then(({ token }) => {
