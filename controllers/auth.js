@@ -46,9 +46,9 @@ function signup(req, res) {
 
 async function login(req, res) {
   try {
-    db.query(`SELECT * FROM users WHERE email = '${req.body.email}'`, (err, user) => {
+    db.query(`SELECT * FROM users WHERE email = '${req.body.email}' LIMIT 1`, (err, result) => {
       if (err) return res.status(401).json({err: 'Error: Bad credentials'});
-      console.log(user)
+      let user = result[0]
       bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
         if (isMatch) {
           const token = createJWT(user);
