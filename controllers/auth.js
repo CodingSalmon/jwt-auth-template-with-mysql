@@ -73,7 +73,6 @@ function show(req, res) {
 function forgotPassword(req, res) {
   const email = req.body.email
   db.query(`SELECT * FROM users WHERE email = '${email}'`, (err, result) => {
-    console.log(result)
     const user = result[0]
     if (err || !user) {
       return res.status(400).json({error: 'User with this email does not exist'})
@@ -129,7 +128,6 @@ async function updatePassword(req, res) {
         }
         try {
           hashPassword(req.body, (hashedUser) => {
-            console.log(hashedUser)
             db.query(`UPDATE users SET password = '${hashedUser.password}' WHERE resetLink = '${hashedUser.token}'`, (err, result) => {
               if (err) {
                 return res.status(400).json({error: 'Reset Password Error'})
