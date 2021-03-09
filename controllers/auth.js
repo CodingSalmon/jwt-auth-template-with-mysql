@@ -32,10 +32,10 @@ function createJWT(user) {
 
 function signup(req, res) {
   try {
-    hashPassword(req.body, (user) => {
-      db.query(`INSERT INTO users (name, email, password) VALUES ('${user.name}', '${user.email}', '${user.password}')`, (err, result) => {
+    hashPassword(req.body, (hashedUser) => {
+      db.query(`INSERT INTO users (name, email, password) VALUES ('${hashedUser.name}', '${hashedUser.email}', '${hashedUser.password}')`, (err, result) => {
         if(err) res.status(500).json({err: 'Error: Database error'});
-        const token = createJWT(user)
+        const token = createJWT(hashedUser)
         res.json({token})
       })
     })
@@ -44,9 +44,9 @@ function signup(req, res) {
   }
 }
 
-async function login(req, res) {
+function login(req, res) {
   try {
-    db.query(`SELECT * FROM users WHERE email = '${req.body.email}' LIMIT 1`, (err, result) => {
+    db.query(`SELECT * FROM users WHERE email = '${req.body.email}'`, (err, result) => {
       if (err) return res.status(401).json({err: 'Error: Bad credentials'});
       let user = result[0]
       bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
@@ -64,18 +64,22 @@ async function login(req, res) {
 }
 
 function show(req, res) {
-  User.findById(req.params.id)
-  .then(res => res.json());
+  db.query(`SELECT * FROM users WHERE id = '${req.params.id}'`, (err, result) => {
+    if (err) return res.status(401).json({err: 'Error: Bad credentials'});
+    res.json(result[0])
+  })
 }
 
 function forgotPassword(req, res) {
   const email = req.body.email
-  User.findOne({email}, (err, user) => {
+  db.query(`SELECT * FROM users WHERE email = '${email}'`, (err, result) => {
+    console.log(result)
+    const user = result[0]
     if (err || !user) {
-      return res.status(400).json({error: 'User with this email already exists'})
+      return res.status(400).json({error: 'User with this email does not exist'})
     }
     
-    const token = jwt.sign({_id: user._id}, process.env.RESET_PASSWORD_KEY, {expiresIn: '15m'})
+    const token = jwt.sign({id: user.id}, process.env.RESET_PASSWORD_KEY, {expiresIn: '15m'})
 
     let transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
@@ -96,7 +100,7 @@ function forgotPassword(req, res) {
       `,
     }
     
-    return user.updateOne({resetLink: token}, (err, user) => {
+    db.query(`UPDATE users SET resetLink = '${token}' WHERE email = '${email}'`, (err, result) => {
       if (err) {
         return res.status(400).json({error: 'reset password link error'})
       } else {
@@ -112,25 +116,31 @@ function forgotPassword(req, res) {
 }
 
 async function updatePassword(req, res) {
-  const {token, password} = req.body
+  const {token} = req.body
   if (token) {
     jwt.verify(token, process.env.RESET_PASSWORD_KEY, function(error, decodedData) {
       if (error) {
         return res.status(400).json({error: 'Incorrect token or it is expired'})
       }
-      User.findOne({resetLink: token}, (err, user) => {
+      db.query(`SELECT * FROM users WHERE resetLink = '${token}'`, (err, result) => {
+        const user = result[0]
         if (err || !user) {
           return res.status(400).json({error: 'User with this token does not exist'})
         }
-      
-        user.password = password
-        user.save((err, result) => {
-          if (err) {
-            return res.status(400).json({error: 'Reset Password Error'})
-          } else {
-            return res.status(200).json({message:'Your password has been changed'})
-          }
-        })
+        try {
+          hashPassword(req.body, (hashedUser) => {
+            console.log(hashedUser)
+            db.query(`UPDATE users SET password = '${hashedUser.password}' WHERE resetLink = '${hashedUser.token}'`, (err, result) => {
+              if (err) {
+                return res.status(400).json({error: 'Reset Password Error'})
+              } else {
+                return res.status(200).json({message:'Your password has been changed'})
+              }
+            })
+          })
+        } catch (err) {
+          return res.status(401).json(err);
+        }
       })
     })
   } else {
