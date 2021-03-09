@@ -4,7 +4,6 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 6;
-let User
 
 module.exports = {
   signup,
