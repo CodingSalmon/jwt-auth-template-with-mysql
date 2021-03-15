@@ -34,4 +34,4 @@ GOOGLE_APP_EMAIL=<google account email>
 GOOGLE_APP_PW=<google account password>
 ```
 
-(note: When deploying change this to your site's url)
+(note: When deploying change CLIENT_URL to your site's url)
