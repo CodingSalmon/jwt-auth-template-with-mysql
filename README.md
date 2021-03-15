@@ -28,8 +28,10 @@ touch .env
 ```
 MYSQL_PW=<your MySQL password>
 SECRET=<any string>
-CLIENT_URL=http://localhost:3000 (note: When deploying change this to your site's url)
+CLIENT_URL=http://localhost:3000
 RESET_PASSWORD_KEY=<any string>
 GOOGLE_APP_EMAIL=<google account email>
 GOOGLE_APP_PW=<google account password>
 ```
+
+(note: When deploying change this to your site's url)
