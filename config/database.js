@@ -30,14 +30,24 @@ function createUserTable() {
     })
 }
 
+function createFriendTable() {
+    db.query("CREATE TABLE friends(user1id INT, user2id INT);", (err, res) => {
+        if (err) throw err;
+        console.log('Friend table created.')
+    })
+}
+
 initialConnection.query('SHOW DATABASES;', (err, databases) => {
     if(err) throw err;
     if(databases.some(db => db.Database === `${databaseName}`)) {
         connectToDatabase()
-        db.query(`SELECT * FROM information_schema.tables WHERE table_schema = '${databaseName}' AND table_name = 'users';`, (err, res) => {
+        db.query(`SELECT * FROM information_schema.tables WHERE table_schema = '${databaseName}';`, (err, res) => {
             if(err) throw err;
-            if(!res.length) {
+            if(!res.some(table => table.TABLE_NAME === 'users')) {
                 createUserTable()
+            }
+            if(!res.some(table => table.TABLE_NAME === 'friends')) {
+                createFriendTable()
             }
         })
     } else {

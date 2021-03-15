@@ -33,13 +33,13 @@ function signup(req, res) {
   try {
     hashPassword(req.body, (hashedUser) => {
       db.query(`INSERT INTO users (name, email, password) VALUES ('${hashedUser.name}', '${hashedUser.email}', '${hashedUser.password}')`, (err, result) => {
-        if(err) res.status(500).json({err: 'Error: Database error'});
+        if(err) return res.status(500).json({err: 'Error: Database error'});
         const token = createJWT(hashedUser)
-        res.json({token})
+        return res.json({token})
       })
     })
   } catch (err) {
-    res.status(400).json(err);
+    return res.status(400).json(err);
   }
 }
 
@@ -51,7 +51,7 @@ function login(req, res) {
       bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
         if (isMatch) {
           const token = createJWT(user);
-          res.json({token});
+          return res.json({token});
         } else {
           return res.status(401).json({err: 'Error: Bad credentials'});
         }
@@ -65,7 +65,7 @@ function login(req, res) {
 function show(req, res) {
   db.query(`SELECT * FROM users WHERE id = '${req.params.id}'`, (err, result) => {
     if (err) return res.status(401).json({err: 'Error: Bad credentials'});
-    res.json(result[0])
+    return res.json(result[0])
   })
 }
 
@@ -113,7 +113,7 @@ function forgotPassword(req, res) {
   })
 }
 
-async function updatePassword(req, res) {
+function updatePassword(req, res) {
   const {token} = req.body
   if (token) {
     jwt.verify(token, process.env.RESET_PASSWORD_KEY, function(error, decodedData) {
