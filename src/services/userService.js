@@ -76,6 +76,27 @@ function resetPassword(password, token) {
   })
 }
 
+function sendFriendRequest(senderId, receiverId) {
+  return fetch(BASE_URL + `add-friend/${senderId}/${receiverId}`, {
+    headers: new Headers({'Content-Type': 'application/json'}),
+  })
+  .then(res => res.json())
+}
+
+function acceptFriendRequest(senderId, receiverId) {
+  return fetch(BASE_URL + `accept-friend/${senderId}/${receiverId}`, {
+    headers: new Headers({'Content-Type': 'application/json'}),
+  })
+  .then(res => res.json())
+}
+
+function getFriends(userId) {
+  return fetch(BASE_URL + `friends/${userId}`, {
+    headers: new Headers({'Content-Type': 'application/json'}),
+  })
+  .then(res => res.json())
+}
+
 let functions = {
   signup,
   getUser,
@@ -84,6 +105,9 @@ let functions = {
   getUserFromId,
   forgotPassword,
   resetPassword,
+  sendFriendRequest,
+  acceptFriendRequest,
+  getFriends,
 };
 
 export default functions

@@ -9,10 +9,8 @@ router.get('/user/:id', authCtrl.show);
 router.put('/reset-password', authCtrl.updatePassword)
 
 router.use(require('../config/auth'));
-
-function checkAuth(req, res, next) {
-    if (req.user) return next();
-    return res.status(401).json({msg: 'Not Authorized'});
-}
+router.get('/friends/:userId', authCtrl.getFriends)
+router.get('/add-friend/:senderId/:receiverId', authCtrl.addFriend)
+router.get('/accept-friend/:senderId/:receiverId', authCtrl.confirmFriend)
 
 module.exports = router;

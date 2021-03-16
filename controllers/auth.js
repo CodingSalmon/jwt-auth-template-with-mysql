@@ -11,6 +11,9 @@ module.exports = {
   show,
   forgotPassword,
   updatePassword,
+  addFriend,
+  confirmFriend,
+  getFriends,
 };
 
 function hashPassword(user, cb) {
@@ -143,4 +146,31 @@ function updatePassword(req, res) {
   } else {
     return res.status(401).json({error: "Authentication Error"})
   }
+}
+
+function addFriend(req, res) {
+  db.query(`INSERT INTO friends (user1id, user2id) VALUES ('${req.params.senderId}', '${req.params.receiverId}')`, (err, result) => {
+    if (err) {
+      return res.status(400).json({error: 'User does not exist'})
+    }
+    return res.json(result)
+  })
+}
+
+function confirmFriend(req, res) {
+  db.query(`UPDATE friends SET status = '1' WHERE user1id = '${req.params.senderId}' AND user2id = '${req.params.receiverId}'`, (err, result) => {
+    if (err) {
+      return res.status(400).json({error: 'Friend request does not exist'})
+    }
+    return res.json(result)
+  })
+}
+
+function getFriends(req, res) {
+  db.query(`SELECT * FROM FRIENDS WHERE user1id = '${req.params.userId}' OR user2id = '${req.params.usedId}'`, (err, result) => {
+    if (err) {
+      return res.status(400).json({error: 'No id was given'})
+    }
+    return res.json(result)
+  })
 }

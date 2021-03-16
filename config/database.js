@@ -31,7 +31,7 @@ function createUserTable() {
 }
 
 function createFriendTable() {
-    db.query("CREATE TABLE friends(user1id INT, user2id INT);", (err, res) => {
+    db.query("CREATE TABLE friends(user1id INT, user2id INT, status ENUM('0', '1') DEFAULT '0', FOREIGN KEY(user1id) REFERENCES users(id), FOREIGN KEY(user2id) REFERENCES users(id));", (err, res) => {
         if (err) throw err;
         console.log('Friend table created.')
     })
@@ -56,6 +56,7 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
             console.log(`${databaseName} database created.`)
             connectToDatabase()
             createUserTable()
+            createFriendTable()
         })
     }
 })
