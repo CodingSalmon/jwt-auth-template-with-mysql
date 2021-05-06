@@ -1,7 +1,25 @@
-.UserPage {
+.user-area {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-bottom: 50px;
+}
+
+.friend-area {
+    display: flex;
+    justify-content: space-around;
+}
+
+.friend-button-area {
+    width: 300px;
+    display: flex;
+    justify-content: space-around;
+}
+
+@media only screen and (max-width: 768px) {
+    .friend-area {
+        align-items: center;
+        flex-direction: column;
+    }
 }

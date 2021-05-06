@@ -12,8 +12,11 @@ module.exports = {
   forgotPassword,
   updatePassword,
   addFriend,
-  confirmFriend,
+  acceptFriend,
+  deleteFriend,
   getFriends,
+  getFriendRequests,
+  getUsers,
 };
 
 function hashPassword(user, cb) {
@@ -51,10 +54,11 @@ function login(req, res) {
     db.query(`SELECT * FROM users WHERE email = '${req.body.email}'`, (err, result) => {
       if (err) return res.status(401).json({err: 'Error: Bad credentials'});
       let user = result[0]
+      if(!user) return res.status(401).json({err: 'Error: User does not exist'})
       bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
         if (isMatch) {
           const token = createJWT(user);
-          return res.json({token});
+          return res.json({token})
         } else {
           return res.status(401).json({err: 'Error: Bad credentials'});
         }
@@ -66,7 +70,7 @@ function login(req, res) {
 }
 
 function show(req, res) {
-  db.query(`SELECT * FROM users WHERE id = '${req.params.id}'`, (err, result) => {
+  db.query(`SELECT id, name, email FROM users WHERE id = '${req.params.id}'`, (err, result) => {
     if (err) return res.status(401).json({err: 'Error: Bad credentials'});
     return res.json(result[0])
   })
@@ -149,16 +153,29 @@ function updatePassword(req, res) {
 }
 
 function addFriend(req, res) {
-  db.query(`INSERT INTO friends (user1id, user2id) VALUES ('${req.params.senderId}', '${req.params.receiverId}')`, (err, result) => {
+  db.query(`INSERT INTO friends (senderId, receiverId) VALUES ('${req.params.id1}', '${req.params.id2}')`, (err, result) => {
     if (err) {
       return res.status(400).json({error: 'User does not exist'})
     }
-    return res.json(result)
+    db.query(`SELECT * FROM friends WHERE senderId = '${req.params.id1}' AND receiverId = '${req.params.id2}'`, (err, resu) => {
+      return res.json(resu[0])
+    })
   })
 }
 
-function confirmFriend(req, res) {
-  db.query(`UPDATE friends SET status = '1' WHERE user1id = '${req.params.senderId}' AND user2id = '${req.params.receiverId}'`, (err, result) => {
+function acceptFriend(req, res) {
+  db.query(`UPDATE friends SET status = '1' WHERE (senderId = '${req.params.id1}' OR receiverId = '${req.params.id1}') AND (senderId = '${req.params.id2}' OR receiverId = '${req.params.id2}')`, (err, result) => {
+    if (err) {
+      return res.status(400).json({error: 'Friend request does not exist'})
+    }
+    db.query(`SELECT id, name, email FROM users WHERE id = '${req.params.id2}'`, (err, result) => {
+      return res.json(result[0])
+    })
+  })
+}
+
+function deleteFriend(req, res) {
+  db.query(`DELETE FROM friends WHERE (senderId = '${req.params.id1}' OR receiverId = '${req.params.id1}') AND (senderId = '${req.params.id2}' OR receiverId = '${req.params.id2}')`, (err, result) => {
     if (err) {
       return res.status(400).json({error: 'Friend request does not exist'})
     }
@@ -167,7 +184,55 @@ function confirmFriend(req, res) {
 }
 
 function getFriends(req, res) {
-  db.query(`SELECT * FROM FRIENDS WHERE user1id = '${req.params.userId}' OR user2id = '${req.params.usedId}'`, (err, result) => {
+  const response = {friends: [], incRequests: [], outRequests: []}
+  db.query(`SELECT * FROM friends WHERE senderId = '${req.params.userId}' OR receiverId = '${req.params.userId}'`, async (err, result) => {
+    if (err) {
+      return res.status(400).json({error: 'No id was given'})
+    }
+    
+    const promises = result.map((resu) => {
+      if (resu.status == 0) {
+        if (resu.senderId == req.params.userId) {
+          return new Promise((resolve, reject) => {db.query(`SELECT id, name, email FROM users WHERE id = '${resu.receiverId}'`, (err, r) => {
+            response.outRequests.push(r[0])
+            resolve()
+          })})
+        } else {
+          return new Promise((resolve, reject) => {db.query(`SELECT id, name, email FROM users WHERE id = '${resu.senderId}'`, (err, r) => {
+            response.incRequests.push(r[0])
+            resolve()
+          })})
+        }
+      } else {
+        if (resu.senderId == req.params.userId) {
+          return new Promise((resolve, reject) => {db.query(`SELECT id, name, email FROM users WHERE id = '${resu.receiverId}'`, (err, r) => {
+            response.friends.push(r[0])
+            resolve()
+          })})
+        } else {
+          return new Promise((resolve, reject) => {db.query(`SELECT id, name, email FROM users WHERE id = '${resu.senderId}'`, (err, r) => {
+            response.friends.push(r[0])
+            resolve()
+          })})
+        }
+      }
+    })
+    await Promise.all(promises)
+    return res.json(response)
+  })
+}
+
+function getFriendRequests(req, res) {
+  db.query(`SELECT senderId, receiverId, status FROM friends`, (err, result) => {
+    if (err) {
+      return res.status(400).json({error: 'No id was given'})
+    }
+    return res.json(result)
+  })
+}
+
+function getUsers(req, res) {
+  db.query(`SELECT id, name, email FROM users`, (err, result) => {
     if (err) {
       return res.status(400).json({error: 'No id was given'})
     }

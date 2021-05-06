@@ -1,0 +1,21 @@
+.UsersPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.user {
+    margin: 20px 0 20px 0;
+    background: lightgray;
+    width: 250px;
+    border-radius: 5px;
+    border: 2px black solid;
+    padding: 3px;
+}
+
+.user-button-area {
+    display: flex;
+    justify-content: flex-end;
+}

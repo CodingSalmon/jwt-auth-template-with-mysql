@@ -18,7 +18,8 @@ const LoginForm = ({ history, handleSignupOrLogin, updateMessage }) => {
         try {
             await userService.login(loginInfo)
             handleSignupOrLogin()
-            history.push("/")
+            const user = userService.getUser()
+            history.push(`/user/${user.id}`)
         } catch (err) {
             updateMessage(err.message)
         }

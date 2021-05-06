@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Route, Switch } from 'react-router-dom';
 
 import NavBar from "../../components/NavBar/NavBar";
@@ -8,6 +8,7 @@ import SignupPage from '../SignupPage/SignupPage';
 import ForgotPasswordPage from '../ForgotPasswordPage/ForgotPasswordPage'
 import ResetPasswordPage from '../ResetPasswordPage/ResetPasswordPage'
 import UserPage from '../UserPage/UserPage'
+import UsersPage from '../UsersPage/UsersPage'
 
 import userService from '../../services/userService';
 
@@ -30,6 +31,10 @@ const App = () => {
     return 'green-text'
   }
 
+  useEffect(() => {
+    setUser(userService.getUser())
+  },[])
+
   return (
     <>
       <NavBar 
@@ -40,7 +45,13 @@ const App = () => {
       <Switch>
         <Route path='/user/:id' render={() => 
           <>
-            <UserPage />
+            <UserPage loggedInUser={user}/>
+          </>
+        }></Route>
+        
+        <Route path='/users' render={() => 
+          <>
+            <UsersPage user={user}/>
           </>
         }></Route>
 

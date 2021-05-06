@@ -76,15 +76,25 @@ function resetPassword(password, token) {
   })
 }
 
-function sendFriendRequest(senderId, receiverId) {
-  return fetch(BASE_URL + `add-friend/${senderId}/${receiverId}`, {
+function sendFriendRequest(user1id, user2id) {
+  return fetch(BASE_URL + `add-friend/${user1id}/${user2id}`, {
+    method: 'POST',
     headers: new Headers({'Content-Type': 'application/json'}),
   })
   .then(res => res.json())
 }
 
-function acceptFriendRequest(senderId, receiverId) {
-  return fetch(BASE_URL + `accept-friend/${senderId}/${receiverId}`, {
+function acceptFriendRequest(user1id, user2id) {
+  return fetch(BASE_URL + `accept-friend/${user1id}/${user2id}`, {
+    method: 'PUT',
+    headers: new Headers({'Content-Type': 'application/json'}),
+  })
+  .then(res => res.json())
+}
+
+function deleteFriend(user1id, user2id) {
+  return fetch(BASE_URL + `delete-friend/${user1id}/${user2id}`, {
+    method:'DELETE',
     headers: new Headers({'Content-Type': 'application/json'}),
   })
   .then(res => res.json())
@@ -92,6 +102,20 @@ function acceptFriendRequest(senderId, receiverId) {
 
 function getFriends(userId) {
   return fetch(BASE_URL + `friends/${userId}`, {
+    headers: new Headers({'Content-Type': 'application/json'}),
+  })
+  .then(res => res.json())
+}
+
+function getFriendRequests() {
+  return fetch(BASE_URL + 'friends', {
+    headers: new Headers({'Content-Type': 'application/json'}),
+  })
+  .then(res => res.json())
+}
+
+function getAllUsers() {
+  return fetch(BASE_URL + 'users', {
     headers: new Headers({'Content-Type': 'application/json'}),
   })
   .then(res => res.json())
@@ -107,7 +131,10 @@ let functions = {
   resetPassword,
   sendFriendRequest,
   acceptFriendRequest,
+  deleteFriend,
   getFriends,
+  getFriendRequests,
+  getAllUsers,
 };
 
 export default functions
