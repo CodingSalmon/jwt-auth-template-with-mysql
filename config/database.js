@@ -64,8 +64,8 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
 })
 
 let mysqlCon = mysql.createConnection({
-    host:'localhost',
-    user:'root',
+    host:`${mysqlHost}`,
+    user:`${mysqlUser}`,
     password:`${mysqlPW}`,
     database:'JWTTemplate'
 })
