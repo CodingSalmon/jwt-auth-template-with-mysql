@@ -25,7 +25,7 @@ function connectToDatabase() {
 }
 
 function createUserTable() {
-    db.query("CREATE TABLE users(id INT AUTO_INCREMENT, name VARCHAR(45) NOT NULL, email VARCHAR(320) UNIQUE, password VARCHAR(60) NOT NULL, resetLink VARCHAR(700) DEFAULT '', PRIMARY KEY (id));", (err, res) => {
+    db.query("CREATE TABLE users(id INT AUTO_INCREMENT, name VARCHAR(45) NOT NULL, email VARCHAR(320) UNIQUE, password VARCHAR(60) NOT NULL, resetLink VARCHAR(400) DEFAULT '', PRIMARY KEY (id));", (err, res) => {
         if (err) throw err;
         console.log('User table created.')
     })
