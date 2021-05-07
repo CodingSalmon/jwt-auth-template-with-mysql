@@ -1,5 +1,7 @@
 const mysql = require('mysql');
 
+const mysqlHost = process.env.MYSQL_HOST
+const mysqlUser = process.env.MYSQL_USER
 const mysqlPW = process.env.MYSQL_PW
 
 let db
@@ -7,9 +9,9 @@ let db
 let databaseName = 'JWTTemplate'
 
 let connectionInfo = {
-    host:'localhost',
-    user:'root',
-    password:process.env.MYSQL_PW,
+    host:mysqlHost,
+    user:mysqlUser,
+    password:mysqlPW,
 }
 
 const initialConnection = mysql.createConnection(connectionInfo)
