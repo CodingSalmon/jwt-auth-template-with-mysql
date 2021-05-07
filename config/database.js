@@ -2,22 +2,21 @@ const mysql = require('mysql');
 
 const mysqlHost = process.env.MYSQL_HOST
 const mysqlUser = process.env.MYSQL_USER
-const mysqlPW = process.env.MYSQL_PW
+const mysqlPw = process.env.MYSQL_PW
+const mysqlDb = process.env.MYSQL_DB
 
 let db
-
-let databaseName = 'JWTTemplate'
 
 let connectionInfo = {
     host:mysqlHost,
     user:mysqlUser,
-    password:mysqlPW,
+    password:mysqlPw,
 }
 
 const initialConnection = mysql.createConnection(connectionInfo)
 
 function connectToDatabase() {
-    connectionInfo.database = `${databaseName}`
+    connectionInfo.database = `${mysqlDb}`
     db = mysql.createConnection(connectionInfo)
     db.connect((err) => {
         if(err) throw err;
@@ -41,9 +40,9 @@ function createFriendTable() {
 
 initialConnection.query('SHOW DATABASES;', (err, databases) => {
     if(err) throw err;
-    if(databases.some(db => db.Database === `${databaseName}`)) {
+    if(databases.some(db => db.Database === `${mysqlDb}`)) {
         connectToDatabase()
-        db.query(`SELECT * FROM information_schema.tables WHERE table_schema = '${databaseName}';`, (err, res) => {
+        db.query(`SELECT * FROM information_schema.tables WHERE table_schema = '${mysqlDb}';`, (err, res) => {
             if(err) throw err;
             if(!res.some(table => table.TABLE_NAME === 'users')) {
                 createUserTable()
@@ -53,9 +52,9 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
             }
         })
     } else {
-        initialConnection.query(`CREATE DATABASE ${databaseName};`, (err, res) => {
+        initialConnection.query(`CREATE DATABASE ${mysqlDb};`, (err, res) => {
             if (err) throw err;
-            console.log(`${databaseName} database created.`)
+            console.log(`${mysqlDb} database created.`)
             connectToDatabase()
             createUserTable()
             createFriendTable()
@@ -66,8 +65,8 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
 let mysqlCon = mysql.createConnection({
     host:`${mysqlHost}`,
     user:`${mysqlUser}`,
-    password:`${mysqlPW}`,
-    database:'JWTTemplate'
+    password:`${mysqlPw}`,
+    database:`${mysqlDb || mysqlDb}`
 })
 
 module.exports = mysqlCon
