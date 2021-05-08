@@ -60,13 +60,14 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
             createFriendTable()
         })
     }
+    // initialConnection.release()
 })
 
 let mysqlCon = mysql.createPool({
-    host:`${mysqlHost}`,
-    user:`${mysqlUser}`,
-    password:`${mysqlPw}`,
-    database:`${mysqlDb}`
+    host:mysqlHost,
+    user:mysqlUser,
+    password:mysqlPw,
+    database:mysqlDb
 })
 
 module.exports = mysqlCon

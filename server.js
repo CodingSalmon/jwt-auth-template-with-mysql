@@ -3,13 +3,13 @@ const app = express();
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
+const cors = require('cors');
 const port = process.env.PORT || 3001;
 
 require('dotenv').config();
 require('./config/database');
 
 const authRouter = require('./routes/auth');
-const cors = require('cors');
 
 app.use(favicon(path.join(__dirname, 'build', 'favicon.ico')));
 app.use(express.static(path.join(__dirname, 'build')));

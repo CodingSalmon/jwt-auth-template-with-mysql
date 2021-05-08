@@ -55,7 +55,7 @@ const UserPage = ({loggedInUser}) => {
                 <p>Email: {user.email}</p>
                 <div className='friend-button-area'>
                     {loggedInUser ?
-                        loggedInUser.id != id ?
+                        loggedInUser.id !== user.id ?
                             outFriendRequests.some(friend => friend.id === loggedInUser.id) ?
                                 <>
                                     <button onClick={() => handleAcceptReq(loggedInUser.id)}>Accept</button>
