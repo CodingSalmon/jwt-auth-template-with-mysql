@@ -62,7 +62,7 @@ initialConnection.query('SHOW DATABASES;', (err, databases) => {
     }
 })
 
-let mysqlCon = mysql.createConnection({
+let mysqlCon = mysql.createPool({
     host:`${mysqlHost}`,
     user:`${mysqlUser}`,
     password:`${mysqlPw}`,
