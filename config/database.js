@@ -5,69 +5,34 @@ const mysqlUser = process.env.MYSQL_USER
 const mysqlPw = process.env.MYSQL_PW
 const mysqlDb = process.env.MYSQL_DB
 
-let db
-
-let connectionInfo = {
+const initialConnection = mysql.createPool({
     host:mysqlHost,
     user:mysqlUser,
     password:mysqlPw,
-}
-
-const initialConnection = mysql.createConnection(connectionInfo)
-
-function connectToDatabase() {
-    connectionInfo.database = `${mysqlDb}`
-    db = mysql.createConnection(connectionInfo)
-    db.connect((err) => {
-        if(err) throw err;
-        console.log(`MySQL connected to ${db.config.database} database.`)
-    })
-}
-
-function createUserTable() {
-    db.query("CREATE TABLE users(id INT AUTO_INCREMENT, name VARCHAR(45) NOT NULL, email VARCHAR(100) UNIQUE, password VARCHAR(60) NOT NULL, resetLink VARCHAR(150) DEFAULT '', PRIMARY KEY (id));", (err, res) => {
-        if (err) throw err;
-        console.log('User table created.')
-    })
-}
-
-function createFriendTable() {
-    db.query("CREATE TABLE friends(senderId INT, receiverId INT, status ENUM('0', '1') DEFAULT '0', FOREIGN KEY(senderId) REFERENCES users(id), FOREIGN KEY(receiverId) REFERENCES users(id));", (err, res) => {
-        if (err) throw err;
-        console.log('Friend table created.')
-    })
-}
-
-initialConnection.query('SHOW DATABASES;', (err, databases) => {
-    if(err) throw err;
-    if(databases.some(db => db.Database === `${mysqlDb}`)) {
-        connectToDatabase()
-        db.query(`SELECT * FROM information_schema.tables WHERE table_schema = '${mysqlDb}';`, (err, res) => {
-            if(err) throw err;
-            if(!res.some(table => table.TABLE_NAME === 'users')) {
-                createUserTable()
-            }
-            if(!res.some(table => table.TABLE_NAME === 'friends')) {
-                createFriendTable()
-            }
-        })
-    } else {
-        initialConnection.query(`CREATE DATABASE ${mysqlDb};`, (err, res) => {
-            if (err) throw err;
-            console.log(`${mysqlDb} database created.`)
-            connectToDatabase()
-            createUserTable()
-            createFriendTable()
-        })
-    }
-    // initialConnection.release()
 })
 
-let mysqlCon = mysql.createPool({
+const mysqlPool = mysql.createPool({
     host:mysqlHost,
     user:mysqlUser,
     password:mysqlPw,
     database:mysqlDb
 })
 
-module.exports = mysqlCon
+function createTables() {
+    mysqlPool.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(45) NOT NULL, email VARCHAR(100) UNIQUE, password VARCHAR(60) NOT NULL, resetLink VARCHAR(150) DEFAULT '', PRIMARY KEY (id));", (error, res) => {
+        if (error) throw error;
+        console.log('User table exists or was created.')
+        mysqlPool.query("CREATE TABLE IF NOT EXISTS friends (senderId INT, receiverId INT, status ENUM('0', '1') DEFAULT '0', FOREIGN KEY(senderId) REFERENCES users(id), FOREIGN KEY(receiverId) REFERENCES users(id));", (err, res) => {
+            if (err) throw err;
+            console.log('Friend table exists or was created.')
+        })
+    })
+}
+
+initialConnection.query(`CREATE DATABASE IF NOT EXISTS ${mysqlDb};`, (err, databases) => {
+    if(err) throw err;
+    console.log(`${mysqlDb} database exists or was created.`)
+    createTables()
+})
+
+module.exports = mysqlPool

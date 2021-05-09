@@ -40,8 +40,11 @@ function signup(req, res) {
     hashPassword(req.body, (hashedUser) => {
       db.query(`INSERT INTO users (name, email, password) VALUES ('${hashedUser.name}', '${hashedUser.email}', '${hashedUser.password}')`, (err, result) => {
         if(err) return res.status(500).json({err: 'Error: Database error'});
-        const token = createJWT(hashedUser)
-        return res.json({token})
+        db.query(`SELECT * FROM users where email = '${req.body.email}'`, (err, r) => {
+          if(err) return res.status(500).json({err: 'Error: Database error'});
+          const token = createJWT(r[0])
+          return res.json({token})
+        })
       })
     })
   } catch (err) {
