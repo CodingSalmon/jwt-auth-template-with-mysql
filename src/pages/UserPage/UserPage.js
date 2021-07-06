@@ -49,76 +49,86 @@ const UserPage = ({loggedInUser}) => {
 
     return (
         <>
-            <div className='user-area'>
-                <h3>{user.name}</h3>
-                <br></br>
-                <p>Email: {user.email}</p>
-                <div className='friend-button-area'>
-                    {loggedInUser ?
-                        loggedInUser.id !== user.id ?
-                            outFriendRequests.some(friend => friend.id === loggedInUser.id) ?
-                                <>
-                                    <button onClick={() => handleAcceptReq(loggedInUser.id)}>Accept</button>
-                                    <button onClick={() => handleDeleteWhileViewing('o')}>Cancel</button>
-                                </>
-                            :incFriendRequests.some(friend => friend.id === loggedInUser.id) ?
-                                <button onClick={() => handleDeleteWhileViewing('i')}>Cancel Friend Request</button>
-                            :friends.some(friend => friend.id === loggedInUser.id) ?
-                                <button onClick={() => handleDeleteWhileViewing('f')}>Unfriend</button>
-                            :<button onClick={handleSendFr}>Send Friend Request</button>
-                        :''
-                    :''}
-                </div>
-            </div>
-            <div className='friend-area'>
-                {loggedInUser ?
-                    loggedInUser.id === user.id ?
-                    <>
-                        <div>
-                            <h5>Pending Requests</h5>
-                            {outFriendRequests.map((fr) => 
-                                <div key={fr.id} className='user'>
-                                    <div>Name: {fr.name}</div>
-                                    <div>Email: {fr.email}</div>
-                                    <div className='user-button-area'>
-                                        <button onClick={() => handleDeleteOnOwnPage(fr.id, 'o')}>Cancel</button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <h5>Incoming Requests</h5>
-                            {incFriendRequests.map((fr) => 
-                                <div key={fr.id} className='user'>
-                                    <div>Name: {fr.name}</div>
-                                    <div>Email: {fr.email}</div>
-                                    <div className='user-button-area'>
-                                        <button onClick={() => handleAcceptReq(fr.id)}>Accept</button>
-                                        <button onClick={() => handleDeleteOnOwnPage(fr.id, 'i')}>Cancel</button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </>
-                    :''
-                :''}
-                <div>
-                    <h5>Friends</h5>
-                    {friends.map((friend) => 
-                        <div key={friend.id} className='user'>
-                            <div>Name: {friend.name}</div>
-                            <div>Email: {friend.email}</div>
+            {user ?
+                <>
+                    <div className='user-area'>
+                        <h3>{user.name}</h3>
+                        <br></br>
+                        <p>Email: {user.email}</p>
+                        <div className='friend-button-area'>
                             {loggedInUser ?
-                                user.id === loggedInUser.id ?
-                                    <div className='user-button-area'>
-                                        <button onClick={() => handleDeleteOnOwnPage(friend.id, 'f')}>Delete</button>
-                                    </div>
+                                loggedInUser.id !== user.id ?
+                                    outFriendRequests.some(friend => friend.id === loggedInUser.id) ?
+                                        <>
+                                            <button onClick={() => handleAcceptReq(loggedInUser.id)}>Accept</button>
+                                            <button onClick={() => handleDeleteWhileViewing('o')}>Cancel</button>
+                                        </>
+                                    :incFriendRequests.some(friend => friend.id === loggedInUser.id) ?
+                                        <button onClick={() => handleDeleteWhileViewing('i')}>Cancel Friend Request</button>
+                                    :friends.some(friend => friend.id === loggedInUser.id) ?
+                                        <button onClick={() => handleDeleteWhileViewing('f')}>Unfriend</button>
+                                    :<button onClick={handleSendFr}>Send Friend Request</button>
                                 :''
                             :''}
                         </div>
-                    )}
-                </div>
-            </div>
+                    </div>
+                    <div className='friend-area'>
+                        {loggedInUser ?
+                            loggedInUser.id === user.id ?
+                            <>
+                                <div>
+                                    <h5>Pending Requests</h5>
+                                    {outFriendRequests ? 
+                                        outFriendRequests.map((fr) => 
+                                            <div key={fr.id} className='user'>
+                                                <div>Name: {fr.name}</div>
+                                                <div>Email: {fr.email}</div>
+                                                <div className='user-button-area'>
+                                                    <button onClick={() => handleDeleteOnOwnPage(fr.id, 'o')}>Cancel</button>
+                                                </div>
+                                            </div>
+                                        )
+                                    :''}
+                                </div>
+                                <div>
+                                    <h5>Incoming Requests</h5>
+                                    {incFriendRequests ?
+                                        incFriendRequests.map((fr) => 
+                                            <div key={fr.id} className='user'>
+                                                <div>Name: {fr.name}</div>
+                                                <div>Email: {fr.email}</div>
+                                                <div className='user-button-area'>
+                                                    <button onClick={() => handleAcceptReq(fr.id)}>Accept</button>
+                                                    <button onClick={() => handleDeleteOnOwnPage(fr.id, 'i')}>Cancel</button>
+                                                </div>
+                                            </div>
+                                        )
+                                    :''}
+                                </div>
+                            </>
+                            :''
+                        :''}
+                        <div>
+                            <h5>Friends</h5>
+                            {friends ? 
+                                friends.map((friend) => 
+                                    <div key={friend.id} className='user'>
+                                        <div>Name: {friend.name}</div>
+                                        <div>Email: {friend.email}</div>
+                                        {loggedInUser ?
+                                            user.id === loggedInUser.id ?
+                                                <div className='user-button-area'>
+                                                    <button onClick={() => handleDeleteOnOwnPage(friend.id, 'f')}>Delete</button>
+                                                </div>
+                                            :''
+                                        :''}
+                                    </div>
+                                )
+                            :''}
+                        </div>
+                    </div>
+                </>
+            :''}
         </>
     )
 }
