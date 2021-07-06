@@ -156,13 +156,10 @@ function updatePassword(req, res) {
 }
 
 function addFriend(req, res) {
-  db.query(`INSERT INTO friends (senderId, receiverId) VALUES ('${req.params.id1}', '${req.params.id2}')`, (err, result) => {
+  db.query(`INSERT INTO friends (senderId, receiverId) VALUES ('${req.user.id}', '${req.params.userId}')`, (err, result) => {
     if (err) {
       return res.status(400).json({error: 'User does not exist'})
     }
-    db.query(`SELECT * FROM friends WHERE senderId = '${req.params.id1}' AND receiverId = '${req.params.id2}'`, (err, resu) => {
-      return res.json(resu[0])
-    })
   })
 }
 

@@ -23,7 +23,7 @@ const UserPage = ({loggedInUser}) => {
     }, [id])
 
     const handleSendFr = async () => {
-        await userService.sendFriendRequest(loggedInUser.id, id)
+        await userService.sendFriendRequest(id)
         setIncFriendRequests([...incFriendRequests, {email: loggedInUser.email, id: loggedInUser.id, name: loggedInUser.name}])
     }
     
@@ -75,37 +75,37 @@ const UserPage = ({loggedInUser}) => {
                     <div className='friend-area'>
                         {loggedInUser ?
                             loggedInUser.id === user.id ?
-                            <>
-                                <div>
-                                    <h5>Pending Requests</h5>
-                                    {outFriendRequests ? 
-                                        outFriendRequests.map((fr) => 
-                                            <div key={fr.id} className='user'>
-                                                <div>Name: {fr.name}</div>
-                                                <div>Email: {fr.email}</div>
-                                                <div className='user-button-area'>
-                                                    <button onClick={() => handleDeleteOnOwnPage(fr.id, 'o')}>Cancel</button>
+                                <>
+                                    <div>
+                                        <h5>Pending Requests</h5>
+                                        {outFriendRequests ? 
+                                            outFriendRequests.map((fr) => 
+                                                <div key={fr.id} className='user'>
+                                                    <div>Name: {fr.name}</div>
+                                                    <div>Email: {fr.email}</div>
+                                                    <div className='user-button-area'>
+                                                        <button onClick={() => handleDeleteOnOwnPage(fr.id, 'o')}>Cancel</button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )
-                                    :''}
-                                </div>
-                                <div>
-                                    <h5>Incoming Requests</h5>
-                                    {incFriendRequests ?
-                                        incFriendRequests.map((fr) => 
-                                            <div key={fr.id} className='user'>
-                                                <div>Name: {fr.name}</div>
-                                                <div>Email: {fr.email}</div>
-                                                <div className='user-button-area'>
-                                                    <button onClick={() => handleAcceptReq(fr.id)}>Accept</button>
-                                                    <button onClick={() => handleDeleteOnOwnPage(fr.id, 'i')}>Cancel</button>
+                                            )
+                                        :''}
+                                    </div>
+                                    <div>
+                                        <h5>Incoming Requests</h5>
+                                        {incFriendRequests ?
+                                            incFriendRequests.map((fr) => 
+                                                <div key={fr.id} className='user'>
+                                                    <div>Name: {fr.name}</div>
+                                                    <div>Email: {fr.email}</div>
+                                                    <div className='user-button-area'>
+                                                        <button onClick={() => handleAcceptReq(fr.id)}>Accept</button>
+                                                        <button onClick={() => handleDeleteOnOwnPage(fr.id, 'i')}>Cancel</button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )
-                                    :''}
-                                </div>
-                            </>
+                                            )
+                                        :''}
+                                    </div>
+                                </>
                             :''
                         :''}
                         <div>

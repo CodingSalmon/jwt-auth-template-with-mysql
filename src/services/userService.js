@@ -75,10 +75,10 @@ function resetPassword(password, token) {
   })
 }
 
-function sendFriendRequest(user1id, user2id) {
-  return fetch(BASE_URL + `add-friend/${user1id}/${user2id}`, {
+function sendFriendRequest(userId) {
+  return fetch(BASE_URL + `add-friend/${userId}`, {
     method: 'POST',
-    headers: new Headers({'Content-Type': 'application/json'}),
+    headers: new Headers({'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenService.getToken()}),
   })
   .then(res => res.json())
 }
@@ -86,7 +86,7 @@ function sendFriendRequest(user1id, user2id) {
 function acceptFriendRequest(user1id, user2id) {
   return fetch(BASE_URL + `accept-friend/${user1id}/${user2id}`, {
     method: 'PUT',
-    headers: new Headers({'Content-Type': 'application/json'}),
+    headers: new Headers({'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenService.getToken()}),
   })
   .then(res => res.json())
 }
@@ -94,7 +94,7 @@ function acceptFriendRequest(user1id, user2id) {
 function deleteFriend(user1id, user2id) {
   return fetch(BASE_URL + `delete-friend/${user1id}/${user2id}`, {
     method:'DELETE',
-    headers: new Headers({'Content-Type': 'application/json'}),
+    headers: new Headers({'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tokenService.getToken()}),
   })
   .then(res => res.json())
 }

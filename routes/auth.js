@@ -12,7 +12,7 @@ router.get('/friends', authCtrl.getFriendRequests)
 router.get('/friends/:userId', authCtrl.getFriends)
 
 router.use(require('../config/auth'));
-router.post('/add-friend/:id1/:id2', checkAuth, authCtrl.addFriend)
+router.post('/add-friend/:userId', checkAuth, authCtrl.addFriend)
 router.put('/accept-friend/:id1/:id2', checkAuth, authCtrl.acceptFriend)
 router.delete('/delete-friend/:id1/:id2', checkAuth, authCtrl.deleteFriend)
 
